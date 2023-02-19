@@ -30,7 +30,7 @@ pipeline {
             steps {
                 sh 'docker stop $(docker ps -q --filter ancestor=WorldOfGames_app)'
                 sh 'docker tag WorldOfGames_app talorgad/WorldOfGames_app'
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'talorgad', passwordVariable: '*******')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'talorgad', passwordVariable: 'To@123456')]) {
                     sh 'docker login -u $USERNAME -p $PASSWORD'
                 }
                 sh 'docker push talorgad/WorldOfGames_app'

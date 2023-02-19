@@ -1,7 +1,3 @@
-# def score_from_file():
-#     file = open("Scores.txt", "r")
-#     score = file.read()
-#     return score
 from Utils import BAD_RETURN_CODE
 from flask import Flask
 
@@ -38,7 +34,9 @@ def score_server():
         return ERROR
 
 
+
 if __name__ == "__main__":
-    app.run()
+    ip_address = '127.0.0.1'
+    app.run(host=ip_address)
 
 

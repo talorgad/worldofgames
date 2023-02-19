@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], userRemoteConfigs: [[url: 'https://github.com/talorgad/WorldOfGames.git']]])
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'docker build -t WorldOfGames_app .'
+            }
+        }
+        
+        stage('Run') {
+            steps {
+                sh 'docker run -d -p 8777:8777 -v $PWD/Scores.txt:/app/Scores.txt WorldOfGames_app'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh 'python3 e2e.py http://localhost:8777 || { echo "e2e tests failed" ; exit 1; }'
+            }
+        }
+        
+        stage('Finalize') {
+            steps {
+                sh 'docker stop $(docker ps -q --filter ancestor=WorldOfGames_app)'
+                sh 'docker tag WorldOfGames_app talorgad/WorldOfGames_app'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'talorgad', passwordVariable: 'To@123456')]) {
+                    sh 'docker login -u $USERNAME -p $PASSWORD'
+                }
+                sh 'docker push talorgad/WorldOfGames_app'
+            }
+        }
+    }
+}
